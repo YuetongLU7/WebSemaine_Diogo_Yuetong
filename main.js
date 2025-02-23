@@ -1,104 +1,121 @@
-const currencies = ['USD', 'BRL', 'JPY', 'chf'];
+const currencies = ['eur', 'usd', 'brl', 'chf'];
 
- // Populate the currency dropdown
- const currencySelect = document.getElementById('currency');
- currencies.forEach(currency => {
-     const option = document.createElement('option');
-     option.value = currency;
-     option.text = currency.toUpperCase();
-     currencySelect.appendChild(option);
- });
- currencySelect.value = 'EUR'; // Default to EUR
+// Map currencies to flag codes
+const currencyToFlag = {
+    eur: 'eu', 
+    usd: 'us', 
+    brl: 'br',
+    chf: 'ch'  // Switzerland
+};
 
- async function fetchHistoricalData(base, currency) {
+const baseCurrencySelect = document.getElementById('baseCurrency');
+const targetCurrencySelect = document.getElementById('targetCurrency');
+const baseFlagElement = document.getElementById('baseFlag');
+const targetFlagElement = document.getElementById('targetFlag');
+
+function populateDropdown(selectElement, defaultValue) {
+    currencies.forEach(currency => {
+        const option = document.createElement('option');
+        option.value = currency;
+        option.text = currency.toUpperCase();
+        selectElement.appendChild(option);
+    });
+    selectElement.value = defaultValue || 'eur'; 
+}
+
+populateDropdown(baseCurrencySelect, 'eur');
+populateDropdown(targetCurrencySelect, 'brl'); 
+
+function updateFlag(selectElement, flagElement) {
+    const currency = selectElement.value;
+    const flagCode = currencyToFlag[currency] || 'eu';
+    // TODO : this is dengerous because it allows for XSS attacks. Can we update just the class name?
+    flagElement.innerHTML = `<span class="flag-icon flag-icon-${flagCode}"></span>`; 
+}
+
+// Event listeners for flag updates
+baseCurrencySelect.addEventListener('change', () => updateFlag(baseCurrencySelect, baseFlagElement));
+targetCurrencySelect.addEventListener('change', () => updateFlag(targetCurrencySelect, targetFlagElement));
+
+async function fetchHistoricalData(base, currency) {
     const startDate = new Date();
+    document.getElementById('currentDay').textContent = startDate; //update the time in UI
+
     startDate.setDate(startDate.getDate() - 30);
     const startDateStr = startDate.toISOString().split('T')[0];
-    console.log(startDateStr)
     const url = `https://api.frankfurter.dev/v1/${startDateStr}..?base=${base}&symbols=${currency}`;
 
     try {
         const response = await fetch(url);
         const data = await response.json();
-        console.log(data)
+        document.getElementById('response').textContent = JSON.stringify(data);
         if (data.error) {
             throw new Error(data.error);
         }
         const dates = Object.keys(data.rates);
         const rates = dates.map(date => data.rates[date][currency.toUpperCase()]);
-        return { dates, rates };
+        return { dates, rates, latestRate: rates[rates.length - 1] || 0 };
     } catch (error) {
         console.error('Erro ao buscar dados:', error);
-        return { dates: [], rates: [] }; // Retorna arrays vazios em caso de erro
+        return { dates: [], rates: [], latestRate: 0 };
     }
 }
 
- // Chart instance (to be updated)
- let chartInstance = null;
+// Chart instance (start ChatGPT)
+// Comme c'est un code pas obligetoire, nous avons décidé de utiliser le code de ChatGPT pour le chart
+let chartInstance = null;
 
- // Function to update the chart
- async function updateChart(currency) {
-     const { dates, rates } = await fetchHistoricalData(currency);
+// Function to update the chart and conversion
+async function updateChart() {
+    const baseCurrency = baseCurrencySelect.value;
+    const targetCurrency = targetCurrencySelect.value;
+    const amount = parseFloat(document.getElementById('amount').value) || 0;
+    const { dates, rates, latestRate } = await fetchHistoricalData(baseCurrency, targetCurrency);
 
-     const ctx = document.getElementById('exchangeChart').getContext('2d');
-     
-     // Destroy existing chart if it exists
-     if (chartInstance) {
-         chartInstance.destroy();
-     }
+    // Update current rate
+    document.getElementById('currentRate').textContent = latestRate.toFixed(4) || 'N/A';
 
-     chartInstance = new Chart(ctx, {
-         type: 'line',
-         data: {
-             labels: dates,
-             datasets: [{
-                 label: `Exchange Rate (${currency.toUpperCase()})`,
-                 data: rates,
-                 borderColor: '#3b82f6', // Tailwind's blue-500
-                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                 fill: true,
-                 tension: 0.4,
-             }]
-         },
-         options: {
-             responsive: true,
-             scales: {
-                 x: { title: { display: true, text: 'Date' } },
-                 y: { title: { display: true, text: 'Exchange Rate' } }
-             }
-         }
-     });
+    // Update converted amount
+    const convertedAmount = (amount * latestRate).toFixed(2);
+    document.getElementById('convertedAmount').value = isNaN(convertedAmount) ? '0.00' : convertedAmount;
 
-     // Return data for download
-     return { dates, rates };
- }
+    const ctx = document.getElementById('exchangeChart').getContext('2d');
 
- // Initial load with EUR
- let currentData = null;
- updateChart('eur').then(data => currentData = data);
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
 
- // Event listener for currency change
- currencySelect.addEventListener('change', (event) => {
-     const selectedCurrency = event.target.value;
-     updateChart(selectedCurrency).then(data => currentData = data);
- });
+    chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: `${baseCurrency.toUpperCase()} to ${targetCurrency.toUpperCase()} Exchange Rate`,
+                data: rates,
+                borderColor: '#3b82f6', // Tailwind's blue-500
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                fill: true,
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'Date' } },
+                y: { title: { display: true, text: 'Exchange Rate' } }
+            }
+        }
+    });
 
- // Download button functionality
- document.getElementById('download').addEventListener('click', () => {
-     if (!currentData) {
-         alert('No data available to download.');
-         return;
-     }
-     const { dates, rates } = currentData;
-     const csvContent = [
-         'Date,Rate',
-         ...dates.map((date, i) => `${date},${rates[i]}`)
-     ].join('\n');
-     const blob = new Blob([csvContent], { type: 'text/csv' });
-     const url = URL.createObjectURL(blob);
-     const a = document.createElement('a');
-     a.href = url;
-     a.download = `exchange_rates_${currencySelect.value}.csv`;
-     a.click();
-     URL.revokeObjectURL(url);
- });
+    // Return data for download
+    return { dates, rates };
+}
+// End ChartIntance (end ChatGPT)
+
+let currentData = null;
+updateChart().then(data => currentData = data);
+
+const amountInput = document.getElementById('amount');
+baseCurrencySelect.addEventListener('change', updateChart);
+targetCurrencySelect.addEventListener('change', updateChart);
+amountInput.addEventListener('change', updateChart);
