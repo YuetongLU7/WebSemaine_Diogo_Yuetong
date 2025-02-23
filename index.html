@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semaine Depertamental Mines Nancy</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="p-6 max-w-4xl w-full bg-white rounded-lg shadow-lg">
+        <!-- Header -->
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">
+            Currency Exchange Rate History
+        </h1>
+
+        <p class="text-center text-sm text-gray-400 mb-4">
+            24 janv. - Aujourd'hui | 1 EUR = <span id="currentRate">5.9947</span> BRL
+        </p>
+
+        <!-- Search Bar (Dropdown) -->
+        <div class="mb-4 space-y-4">
+            <div class="flex items-center justify-between">
+                <label class="text-sm font-medium">Base</label>
+                <div class="relative">
+                    <select id="currency"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Options populated via JavaScript -->
+                    </select>
+                    <span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs">
+                        <span class="flag-icon flag-icon-eu"></span>
+                    </span>
+                </div>
+            </div>
+            <input type="number" id="amount" value="1000"
+                class="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                placeholder="Montant">
+
+            <div class="flex items-center justify-between">
+                <label class="text-sm font-medium">Recevez</label>
+                <div class="relative">
+                    <select id="currency"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Options populated via JavaScript -->
+                    </select>
+                    <span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs">
+                        <span class="flag-icon flag-icon-br"></span>
+                    </span>
+                </div>
+            </div>
+            <input type="text" id="convertedAmount"
+                class="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-white" readonly value="5929.21">
+        </div>
+
+
+        <div class="mb-6">
+            <canvas id="exchangeChart"></canvas>
+        </div>
+
+        <!-- Download Button -->
+        <button id="download"
+            class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200">
+            Download Data as CSV
+        </button>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="main.js"></script>
+</body>
+
+</html>
