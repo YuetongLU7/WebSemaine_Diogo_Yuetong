@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semaine Départementale Mines Nancy</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Flag Icons CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" rel="stylesheet">
+</head>
+
+<body class="min-h-screen p-4 items-center justify-center">
+    <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">
+        Semaine Départementale Mines Nancy
+    </h1>
+
+    <!-- Currency Inputs -->
+    <div class="mb-4 space-y-4">
+        <div class="flex items-center justify-between">
+            <label class="text-sm font-medium">Base</label>
+            <div class="relative">
+                <select id="baseCurrency"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <!-- Options populated via JavaScript -->
+                </select>
+                <span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs" id="baseFlag">
+                    <span class="flag-icon flag-icon-eu"></span>
+                </span>
+            </div>
+        </div>
+        <input type="number" id="amount" value="1000"
+            class="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            placeholder="Montant">
+
+        <div class="flex items-center justify-between">
+            <label class="text-sm font-medium">Recevez</label>
+            <div class="relative">
+                <select id="targetCurrency"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <!-- Options populated via JavaScript -->
+                </select>
+                <span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs" id="targetFlag">
+                    <span class="flag-icon flag-icon-br"></span>
+                </span>
+            </div>
+        </div>
+        <input type="text" id="convertedAmount"
+            class="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-white" readonly value="5929.21">
+        <p class="text-center text-sm text-gray-400 mb-4">
+            <span id="currentDay"></span> | <span id="montantAmout">1</span> <span id="baseCurrencyText">EUR</span> =
+            <span id="currentRate">5.44</span>
+            <span id="targetCurrencyText">BRL</span>
+        </p>
+    </div>
+
+    <!-- Graph -->
+    <div class="mb-6">
+        <canvas id="exchangeChart"></canvas>
+    </div>
+
+    <!-- Response from JSON -->
+    <div>
+        <p class="text-sm font-medium">Response</p>
+        <p id="response" class="text-sm text-gray-400"></p>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="main.js"></script>
+</body>
+
+</html>
