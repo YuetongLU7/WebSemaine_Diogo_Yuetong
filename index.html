@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Semaine Départementale Mines Nancy</title>
+    <link rel="icon" type="image/png" href="assets/exchange.png">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
@@ -19,7 +20,7 @@
     </h1>
 
     <!-- Currency Inputs -->
-    <div class="mb-4 space-y-4">
+    <div class="mb-8 space-y-6 px-8 py-6 bg-gray-50 rounded-lg shadow">
         <div class="flex items-center justify-between">
             <label class="text-sm font-medium">Base</label>
             <div class="relative">
@@ -58,12 +59,12 @@
     </div>
 
     <!-- Graph -->
-    <div class="mb-6">
+    <div class="mb-6 max-w-5xl mx-auto">
         <canvas id="exchangeChart"></canvas>
     </div>
 
     <!-- Response from JSON -->
-    <div>
+    <div class="p-3 bg-gray-200 rounded-lg shadow">
         <p class="text-sm font-medium">Response</p>
         <p id="response" class="text-sm text-gray-400"></p>
     </div>
