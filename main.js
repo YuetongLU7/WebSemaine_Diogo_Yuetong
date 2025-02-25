@@ -1,4 +1,4 @@
-// Map currencies to flag codes from ISO 3166-1 to alpha-2
+// Map currencies to flag codes from ISO 3166-1 to alpha-2 to the icon library
 const currencyToFlag = {
     EUR: "eu", // Euro (União Europeia)
     USD: "us", // United States Dollar
@@ -54,6 +54,8 @@ async function fetchCurrencies() {
     }
 }
 
+let originalOptions = [];
+
 function populateDropdowns(currencies) {   
     originalOptions = []; 
     for (const code in currencies) {
@@ -76,6 +78,26 @@ function populateDropdowns(currencies) {
     updateChart();
 }
 
+function updateDropdownOptions() {
+    const baseSelected = baseCurrencySelect.value;
+    const targetSelected = targetCurrencySelect.value;
+
+    targetCurrencySelect.innerHTML = '';
+    originalOptions.forEach(option => {
+        if (option.value !== baseSelected) {
+            targetCurrencySelect.appendChild(option.cloneNode(true));
+        }
+    });
+    targetCurrencySelect.value = targetSelected === baseSelected ? originalOptions[0].value : targetSelected;
+
+    baseCurrencySelect.innerHTML = '';
+    originalOptions.forEach(option => {
+        if (option.value !== targetSelected) {
+            baseCurrencySelect.appendChild(option.cloneNode(true));
+        }
+    });
+    baseCurrencySelect.value = baseSelected === targetSelected ? originalOptions[0].value : baseSelected;
+}
 
 function updateFlag(selectElement, flagElement) {
     const currency = selectElement.value.toUpperCase(); 
