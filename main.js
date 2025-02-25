@@ -38,6 +38,9 @@ const baseCurrencySelect = document.getElementById('baseCurrency');
 const targetCurrencySelect = document.getElementById('targetCurrency');
 const baseFlagElement = document.getElementById('baseFlag');
 const targetFlagElement = document.getElementById('targetFlag');
+const amountInput = document.getElementById('amount');
+const currentRateElement = document.getElementById('currentRateElement');
+const convertedAmount = document.getElementById('convertedAmount');
 
 async function fetchCurrencies() {
     try {
@@ -103,7 +106,6 @@ async function fetchHistoricalData(base, currency) {
     }
     
     const startDate = new Date();
-    document.getElementById('currentDay').textContent = startDate; //update the time in UI
 
     startDate.setDate(startDate.getDate() - 30);
     const startDateStr = startDate.toISOString().split('T')[0];
@@ -192,10 +194,6 @@ async function updateChart() {
 let currentData = null;
 updateChart().then(data => currentData = data);
 
-const amountInput = document.getElementById('amount');  
-// baseCurrencySelect.addEventListener('change', updateChart);
-// targetCurrencySelect.addEventListener('change', updateChart);
-// amountInput.addEventListener('input', updateChart); 
 
 populateDropdowns().then(() => {
     baseCurrencySelect.addEventListener('change', updateChart);
