@@ -99,82 +99,43 @@ function updateDropdownOptions() {
     baseCurrencySelect.value = baseSelected === targetSelected ? originalOptions[0].value : baseSelected;
 }
 
+
 function updateFlag(selectElement, flagElement) {
-    const currency = selectElement.value.toUpperCase(); 
-    const flagCode = currencyToFlag[currency] || 'eu'; 
+    const currency = selectElement.value.toUpperCase();
+    const flagCode = currencyToFlag[currency] || 'eu';
     flagElement.innerHTML = `<span class="flag-icon flag-icon-${flagCode}"></span>`;
 }
 
-// Event listeners for flag updates
-baseCurrencySelect.addEventListener('change', () => updateFlag(baseCurrencySelect, baseFlagElement));
-targetCurrencySelect.addEventListener('change', () => updateFlag(targetCurrencySelect, targetFlagElement));
+// Função para buscar taxa de câmbio
+function fetchExchangeRate(base, target) {
+    const date30DaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; //more efficient
+    const url = `https://api.frankfurter.dev/v1/${date30DaysAgo}..?from=${base}&to=${target}`;
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('response').textContent = JSON.stringify(data);
+            const rates = Object.values(data.rates).map(rate => rate[target]); // Corrigido para array
+            const dates = Object.keys(data.rates);
+            const lastRate = rates[rates.length - 1];
+            updateTextSnippet(lastRate, base, target);
+            updateChartWithRate(dates, rates);
+        });
+}
 
-async function fetchHistoricalData(base, currency) {
-    if (!base || !currency) {
-        console.error("Erreur: base ou currency est vide !");
-        return { dates: [], rates: [], latestRate: 0 };
-    }
-
-    // Directly set the exchange rate to 1.00 without requesting the API to avoid errors when the API returns nothing.
-    if (base === currency) {
-        return { dates: [], rates: [], latestRate: 1.00 };  
-    }
-    
-    const startDate = new Date();
-
-    startDate.setDate(startDate.getDate() - 30);
-    const startDateStr = startDate.toISOString().split('T')[0];
-    //Make sure startDateStr is in the correct date format (YYYY-MM-DD)
-    const url = `https://api.frankfurter.dev/v1/${startDateStr}..?base=${base}&symbols=${currency}`;
-    console.log("Requête API:", url);
-    
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        document.getElementById('response').textContent = JSON.stringify(data);
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        const dates = Object.keys(data.rates);
-        const rates = dates.map(date => data.rates[date][currency.toUpperCase()]);
-        return { dates, rates, latestRate: rates[rates.length - 1] || 0 };
-    } catch (error) {
-        console.error('Erro ao buscar dados:', error);
-        return { dates: [], rates: [], latestRate: 0 };
-    }
+function updateTextSnippet(rate, base, target) {
+    const amount = parseFloat(amountInput.value) || 0;
+    const convertedAmountValue = (amount * rate).toFixed(2);
+    convertedAmount.value = convertedAmountValue;
+    const time_now = new Date().toLocaleString();
+    currentRateElement.textContent = `${time_now} | 1 ${base} = ${rate} ${target}`;
 }
 
 // Chart instance (start ChatGPT)
 // Comme c'est un code pas obligetoire, nous avons décidé de utiliser le code de ChatGPT pour le chart
 let chartInstance = null;
 
-// Function to update the chart and conversion
-async function updateChart() {
-    const baseCurrency = baseCurrencySelect.value;
-    const targetCurrency = targetCurrencySelect.value;
-    
-    if (!baseCurrency || !targetCurrency) {
-        console.warn("Sélectionnez une devise avant de mettre à jour le graphique.");
-        return;
-    }
-    
-    const amount = parseFloat(document.getElementById('amount').value) || 0;
-    const { dates, rates, latestRate } = await fetchHistoricalData(baseCurrency, targetCurrency);
-
-    if (latestRate === 0) {
-        console.warn("Pas de taux de change disponible.");
-        return;
-    }
-
-    // Update current rate
-    document.getElementById('currentRate').textContent = latestRate.toFixed(4) || 'N/A';
-
-    // Update converted amount
-    const convertedAmount = (amount * latestRate).toFixed(2);
-    document.getElementById('convertedAmount').value = isNaN(convertedAmount) ? '0.00' : convertedAmount;
-
+function updateChartWithRate(dates, rates) {
     const ctx = document.getElementById('exchangeChart').getContext('2d');
-
     if (chartInstance) {
         chartInstance.destroy();
     }
@@ -184,9 +145,9 @@ async function updateChart() {
         data: {
             labels: dates,
             datasets: [{
-                label: `${baseCurrency.toUpperCase()} to ${targetCurrency.toUpperCase()} Exchange Rate`,
+                label: `${baseCurrencySelect.value} to ${targetCurrencySelect.value} Exchange Rate`, // Corrigido
                 data: rates,
-                borderColor: '#3b82f6', // Tailwind's blue-500
+                borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 fill: true,
                 tension: 0.4,
@@ -200,12 +161,18 @@ async function updateChart() {
             }
         }
     });
-
-    // Return data for download
-    return { dates, rates };
 }
 // End ChartIntance (end ChatGPT)
 
+/**
+ * This function is triggered when the user changes the base currency or target currency.
+ * It updates the flag, dropdown options, and chart.
+ */
+function updateChart() {
+    const baseCurrency = baseCurrencySelect.value;
+    const targetCurrency = targetCurrencySelect.value;
+    fetchExchangeRate(baseCurrency, targetCurrency);
+}
 
 baseCurrencySelect.addEventListener('change', () => {
     updateDropdownOptions();
