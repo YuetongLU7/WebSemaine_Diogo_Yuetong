@@ -46,37 +46,30 @@ async function fetchCurrencies() {
     try {
         const response = await fetch("https://api.frankfurter.dev/v1/currencies");
         const currencies = await response.json();
-        return currencies;
+        populateDropdowns(currencies);
+        return;
     } catch (error) {
         console.error("Unable to retrieve data:", error);
         return {}; 
     }
 }
 
-async function populateDropdowns() {
-    const currencies = await fetchCurrencies();
-
-    if (Object.keys(currencies).length === 0) {
-        console.error("No data");
-        return;
+function populateDropdowns(currencies) {   
+    originalOptions = []; 
+    for (const code in currencies) {
+        const name = currencies[code];
+        const option = document.createElement('option');
+        option.value = code;
+        option.textContent = `${code} - ${name}`;
+        originalOptions.push(option);
+        baseCurrencySelect.appendChild(option.cloneNode(true));
+        targetCurrencySelect.appendChild(option.cloneNode(true));
     }
 
-    for (const [code, name] of Object.entries(currencies)) {
-        const option1 = document.createElement('option');
-        const option2 = document.createElement('option');
+    baseCurrencySelect.value = "EUR";
+    targetCurrencySelect.value = "BRL";
 
-        option1.value = code;
-        option1.textContent = `${code} - ${name}`;
-        option2.value = code;
-        option2.textContent = `${code} - ${name}`;
-
-        baseCurrencySelect.appendChild(option1);
-        targetCurrencySelect.appendChild(option2);
-    }
-
-    baseCurrencySelect.value = "EUR"; 
-    targetCurrencySelect.value = "BRL"; 
-
+    updateDropdownOptions(); 
     updateFlag(baseCurrencySelect, baseFlagElement);
     updateFlag(targetCurrencySelect, targetFlagElement);
 
@@ -191,12 +184,19 @@ async function updateChart() {
 }
 // End ChartIntance (end ChatGPT)
 
-let currentData = null;
-updateChart().then(data => currentData = data);
 
-
-populateDropdowns().then(() => {
-    baseCurrencySelect.addEventListener('change', updateChart);
-    targetCurrencySelect.addEventListener('change', updateChart);
-    amountInput.addEventListener('input', updateChart); //Update the chart as the user types
+baseCurrencySelect.addEventListener('change', () => {
+    updateDropdownOptions();
+    updateFlag(baseCurrencySelect, baseFlagElement);
+    updateChart();
 });
+
+targetCurrencySelect.addEventListener('change', () => {
+    updateDropdownOptions();
+    updateFlag(targetCurrencySelect, targetFlagElement);
+    updateChart();
+});
+
+amountInput.addEventListener('input', updateChart);
+
+fetchCurrencies();
