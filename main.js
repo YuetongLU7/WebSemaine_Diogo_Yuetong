@@ -1,10 +1,37 @@
-// Map currencies to flag codes
+// Map currencies to flag codes from ISO 3166-1 to alpha-2
 const currencyToFlag = {
-    EUR: "eu", USD: "us", BRL: "br", CHF: "ch", CNY: "cn",
-        AUD: "au", CAD: "ca", GBP: "gb", JPY: "jp", HKD: "hk",
-        SGD: "sg", NZD: "nz", KRW: "kr", INR: "in", MXN: "mx",
-        ZAR: "za", RUB: "ru", THB: "th", SEK: "se", NOK: "no",
-        DKK: "dk", MYR: "my", IDR: "id", PHP: "ph", PLN: "pl"
+    EUR: "eu", // Euro (União Europeia)
+    USD: "us", // United States Dollar
+    BRL: "br", // Brazilian Real
+    CHF: "ch", // Swiss Franc
+    CNY: "cn", // Chinese Renminbi Yuan
+    AUD: "au", // Australian Dollar
+    CAD: "ca", // Canadian Dollar
+    GBP: "gb", // British Pound
+    JPY: "jp", // Japanese Yen
+    HKD: "hk", // Hong Kong Dollar
+    SGD: "sg", // Singapore Dollar
+    NZD: "nz", // New Zealand Dollar
+    KRW: "kr", // South Korean Won
+    INR: "in", // Indian Rupee
+    MXN: "mx", // Mexican Peso
+    ZAR: "za", // South African Rand
+    RUB: "ru", // Russian Rubles
+    THB: "th", // Thai Baht
+    SEK: "se", // Swedish Krona
+    NOK: "no", // Norwegian Krone
+    DKK: "dk", // Danish Krone
+    MYR: "my", // Malaysian Ringgit
+    IDR: "id", // Indonesian Rupiah
+    PHP: "ph", // Philippine Peso
+    PLN: "pl", // Polish Złoty
+    BGN: "bg", // Bulgarian Lev
+    CZK: "cz", // Czech Koruna
+    HUF: "hu", // Hungarian Forint
+    ILS: "il", // Israeli New Sheqel
+    ISK: "is", // Icelandic Króna
+    RON: "ro", // Romanian Leu
+    TRY: "tr"  // Turkish Lira
 };
 
 const baseCurrencySelect = document.getElementById('baseCurrency');
