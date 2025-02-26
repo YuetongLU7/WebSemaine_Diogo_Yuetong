@@ -1,8 +1,9 @@
-<div style="display: flex; align-items: center;" >
-    <img src="./assets/exchange.png" alt="Currency Exchange" width="60" style="margin-right: 10px; margin-bottom: 13px;">
-    <h1>Currency Converter Web Page</h1>
-</div>
-
+<table>
+  <tr>
+    <td><img src="./assets/exchange.png" alt="Currency Exchange" width="60" style="margin-right: 10px;"></td>
+    <td><h1>Currency Converter Web Page</h1></td>
+  </tr>
+</table>
 
 # Currency Converter 🌍
 
@@ -61,25 +62,35 @@ fetch(`https://api.frankfurter.app/latest?base=USD&symbols=EUR,GBP,JPY`)
 ## Improvements
 
 ### 1️⃣ API Nesting: Efficient Data Fetching
-We implemented **API nesting** to optimize data retrieval. The process ensures that the **currency selection dropdowns are updated first**, and only after this step does the system request the latest exchange rate. This prevents unnecessary API calls and ensures smoother execution.
+We implemented **API nesting** to optimize data retrieval. First, we populate the currency selection dropdowns by fetching available currencies dynamically from the **Frankfurter API**. Once the dropdowns are updated, we then proceed to fetch exchange rate data, ensuring **smooth execution** and avoiding unnecessary API calls.
 
 ### 2️⃣ Dynamic Dropdown Update: Populating Currency Options Dynamically
-Instead of hardcoding available currencies, we now retrieve them dynamically from the **Frankfurter API**. This ensures that our dropdown lists always reflect the most up-to-date selection of supported currencies.
+Previously, available currencies were hardcoded, which limited flexibility. Now, the dropdown lists are populated dynamically from the **Frankfurter API**, ensuring that users always have access to the latest currency options.
 
 ### 3️⃣ Preventing Selection of the Same Currency
-We implemented logic to prevent users from selecting **the same currency** as both the base and target. If a user selects the same currency in both fields, the system **automatically selects an alternative valid option** to maintain correctness.
+To **prevent users from selecting the same currency** as both the base and target currency, we dynamically update the dropdown options:
+   - When the user selects a base currency, that currency is **removed** from the target currency dropdown.
+   - When the user selects a target currency, that currency is **removed** from the base currency dropdown.
+   - If both are the same, the system **automatically selects an alternative valid currency**.
 
 ### 4️⃣ Fetching Exchange Rates: `fetchExchangeRate()`
-This function retrieves exchange rate data for the selected currency pair and stores the most recent exchange rate for conversion.
+This function retrieves exchange rate data for the selected currency pair by requesting data from the **Frankfurter API**. The function processes the returned JSON data and extracts relevant exchange rates for calculations.
 
 ### 5️⃣ Real-Time Rate Display: `updateTextSnippet()`
-This function updates the displayed exchange rate in real-time, showing the **current timestamp** and the **exchange rate for 1 unit** of the base currency.
+This function ensures real-time updates to the displayed exchange rate, showing **the exact timestamp** and the **exchange rate for 1 unit** of the base currency. This helps users track the most recent exchange rate.
 
 ### 6️⃣ Historical Exchange Rate Chart: `updateChartWithRate()`
-The chart visualizes exchange rate fluctuations over the past **30 days**, providing valuable market insights. The **x-axis** represents the **dates**, and the **y-axis** represents the exchange rate.
+The chart visualizes exchange rate fluctuations over the past **30 days**:
+   - The **x-axis** represents **dates** (timeline of exchange rate changes).
+   - The **y-axis** represents **exchange rates** (currency values over time).
+   - The chart is dynamically updated each time the user selects a new currency pair.
 
 ### 7️⃣ Clean Code & Best Practices
-We follow **Uncle Bob's Clean Code Principles**, emphasizing **single-responsibility functions** and modular, maintainable code. We also use **uv** for Python environment management.
+We follow **Uncle Bob's Clean Code Principles**, ensuring:
+   - **Single-responsibility functions** (each function has a distinct, well-defined purpose).
+   - **Modular design** (functions are independent and reusable).
+   - **Maintainability** (code is structured, clear, and scalable).
+   - **Python environment management** using `uv`.
 
 ---
 
@@ -91,4 +102,3 @@ This project is open-source and free to use under the MIT License.
 All the packages are routed trough the CDN of npm, which can cause errors if for some reason is out of service.
 
 If you find any issues or want to improve the project, feel free to open a pull request.
-
