@@ -82,21 +82,13 @@ function updateDropdownOptions() {
     const baseSelected = baseCurrencySelect.value;
     const targetSelected = targetCurrencySelect.value;
 
-    targetCurrencySelect.innerHTML = '';
-    originalOptions.forEach(option => {
-        if (option.value !== baseSelected) {
-            targetCurrencySelect.appendChild(option.cloneNode(true));
-        }
+    targetCurrencySelect.querySelectorAll("option").forEach(option => {
+        option.disabled = (option.value === baseSelected);
     });
-    targetCurrencySelect.value = targetSelected === baseSelected ? originalOptions[0].value : targetSelected;
 
-    baseCurrencySelect.innerHTML = '';
-    originalOptions.forEach(option => {
-        if (option.value !== targetSelected) {
-            baseCurrencySelect.appendChild(option.cloneNode(true));
-        }
+    baseCurrencySelect.querySelectorAll("option").forEach(option => {
+        option.disabled = (option.value === targetSelected);
     });
-    baseCurrencySelect.value = baseSelected === targetSelected ? originalOptions[0].value : baseSelected;
 }
 
 
